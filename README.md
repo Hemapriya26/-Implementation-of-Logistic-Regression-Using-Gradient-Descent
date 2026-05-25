@@ -25,76 +25,67 @@ Program to implement the the Logistic Regression Using Gradient Descent.
 Developed by: Hemapriya P
 RegisterNumber:  212225040126
 
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix
 
-# Load data
-data = pd.read_csv('/content/Placement_Data (1).csv')
+df = pd.read_csv("Placement_Data.csv")
 
-# Convert Placed / Not Placed to 1 / 0
-data['status'] = data['status'].map({'Placed': 1, 'Not Placed': 0})
+label = LabelEncoder()
 
-# Take only 2 features (simple)
-X = data[['ssc_p', 'mba_p']].values
-y = data['status'].values
+df['gender'] = label.fit_transform(df['gender'])
+df['ssc_b'] = label.fit_transform(df['ssc_b'])
+df['hsc_b'] = label.fit_transform(df['hsc_b'])
+df['hsc_s'] = label.fit_transform(df['hsc_s'])
+df['degree_t'] = label.fit_transform(df['degree_t'])
+df['workex'] = label.fit_transform(df['workex'])
+df['specialisation'] = label.fit_transform(df['specialisation'])
+df['status'] = label.fit_transform(df['status'])
 
-# -----------------------------
-# Standard Scaler (Normalization)
-# -----------------------------
-scaler = StandardScaler()
-X = scaler.fit_transform(X)
+X = df[['ssc_p','hsc_p','degree_p','etest_p','mba_p']]
 
-# Add bias column (1)
-m = len(y)
-X = np.c_[np.ones(m), X]
+y = df['status']
 
-# Sigmoid function
-def sigmoid(z):
-    return 1 / (1 + np.exp(-z))
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
 
-# Cost function
-def cost_function(X, y, theta):
-    h = sigmoid(X @ theta)
-    return (-1/m) * np.sum(y*np.log(h) + (1-y)*np.log(1-h))
+model = LogisticRegression()
 
-# Gradient Descent
-theta = np.zeros(X.shape[1])
-alpha = 0.1
-cost_history = []
+model.fit(X_train, y_train)
 
-for i in range(500):
-    z = X @ theta
-    h = sigmoid(z)
-    gradient = (1/m) * X.T @ (h - y)
-    theta = theta - alpha * gradient
-    
-    cost = cost_function(X, y, theta)
-    cost_history.append(cost)
+y_pred = model.predict(X_test)
 
-# Prediction
-y_pred = (sigmoid(X @ theta) >= 0.5).astype(int)
+print("Accuracy:", accuracy_score(y_test, y_pred))
 
-# Accuracy
-accuracy = np.mean(y_pred == y) * 100
-print("Weights:", theta)
-print("Accuracy:", accuracy, "%")
+print("Confusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
 
-# -----------------------------
-# PLOT: Cost vs Iterations
-# -----------------------------
-plt.figure()
-plt.plot(cost_history)
-plt.xlabel("Iterations")
-plt.ylabel("Cost")
-plt.title("Logistic Regression using Gradient Descent")
+plt.scatter(df['mba_p'], df['etest_p'], c=df['status'])
+
+plt.xlabel("MBA Percentage")
+plt.ylabel("Etest Percentage")
+plt.title("Student Placement Prediction")
+
 plt.show()
+
+new_student = [[75, 70, 80, 85, 78]]
+
+prediction = model.predict(new_student)
+
+if prediction[0] == 1:
+    print("Placed")
+else:
+    print("Not Placed")
 ```
 
 ## Output:
 
-<img width="758" height="627" alt="image" src="https://github.com/user-attachments/assets/cfd5e251-e571-472f-b34e-8b623427d0aa" />
+<img width="571" height="455" alt="WhatsApp Image 2026-05-25 at 9 53 46 AM" src="https://github.com/user-attachments/assets/8a684929-0ec0-492b-9c9d-55ae06cb6935" />
+
 
 ## Result:
 Thus the program to implement the the Logistic Regression Using Gradient Descent is written and verified using python programming.
