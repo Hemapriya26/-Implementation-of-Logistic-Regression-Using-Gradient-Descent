@@ -27,53 +27,58 @@ Program to implement the the Logistic Regression Using Gradient Descent.
 Developed by: Hemapriya P
 RegisterNumber:  212225040126
 
-import pandas as pd
-from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import SGDClassifier
-from sklearn.metrics import accuracy_score, confusion_matrix
+import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
 
-iris = load_iris()
+np.random.seed(0)
+X = np.random.randn(100, 2)
+y = (X[:, 0] + X[:, 1] > 0).astype(int)
 
-X = iris.data
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
 
-y = iris.target
+weights = np.zeros(2)
+bias = 0
+lr = 0.1
+epochs = 1000
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+for _ in range(epochs):
+    linear_model = np.dot(X, weights) + bias
+    y_pred = sigmoid(linear_model)
 
-model = SGDClassifier()
+    dw = (1/len(X)) * np.dot(X.T, (y_pred - y))
+    db = (1/len(X)) * np.sum(y_pred - y)
 
-model.fit(X_train, y_train)
+    weights -= lr * dw
+    bias -= lr * db
 
-y_pred = model.predict(X_test)
+probabilities = sigmoid(np.dot(X, weights) + bias)
+y_pred_final = (probabilities >= 0.5).astype(int)
 
-print("Accuracy:", accuracy_score(y_test, y_pred))
+print("Accuracy:", accuracy_score(y, y_pred_final))
+print("\nConfusion Matrix:\n", confusion_matrix(y, y_pred_final))
+print("\nClassification Report:\n", classification_report(y, y_pred_final))
 
-print("Confusion Matrix:")
-print(confusion_matrix(y_test, y_pred))
+plt.scatter(X[:, 0], X[:, 1], c=y, cmap='bwr')
 
-new_flower = [[5.1, 3.5, 1.4, 0.2]]
+x_vals = np.array([min(X[:, 0]), max(X[:, 0])])
+y_vals = -(weights[0]*x_vals + bias) / weights[1]
 
-prediction = model.predict(new_flower)
+plt.plot(x_vals, y_vals, color='black')
 
-print("Predicted Species:", iris.target_names[prediction][0])
-
-plt.scatter(X[:,0], X[:,1], c=y)
-
-plt.xlabel("Sepal Length")
-plt.ylabel("Sepal Width")
-plt.title("Iris Flower Classification")
-
+plt.title("Logistic Regression (Gradient Descent)")
+plt.xlabel("Feature 1")
+plt.ylabel("Feature 2")
 plt.show()
+
 ```
 
 ## Output:
 
-<img width="1205" height="721" alt="image" src="https://github.com/user-attachments/assets/73063889-24ab-4dca-a5fd-1729ba1b281d" />
+<img width="564" height="382" alt="image" src="https://github.com/user-attachments/assets/0aebd395-83f6-4a31-a1a4-fe06d50be5b1" />
 
+<img width="810" height="650" alt="image" src="https://github.com/user-attachments/assets/7e44ba10-7441-43af-bcc5-c03afe51d8e3" />
 
 ## Result:
 Thus the program to implement the the Logistic Regression Using Gradient Descent is written and verified using python programming.
